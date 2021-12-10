@@ -1,25 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import styles from './App.module.css';
+import {useEffect, useState} from "react";
+import {authContext} from "./context/context";
+import {authAPI} from "./api/api";
+import {PrivateRoutes} from "./components/PrivateRoutes";
+import {PublicRoutes} from "./components/PublicRoutes";
+import {Redirect} from "react-router-dom";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+	const [user, setUser] = useState()
+
+	useEffect(() => {
+		authAPI.isAuth()
+			.then(res => {
+				setUser(res.email)
+			})
+	}, [])
+
+	return (
+		<div className={styles.container}>
+			<authContext.Provider value={{user, setUser}}>
+				{user ? <PrivateRoutes/> : <PublicRoutes/>}
+				<Redirect to={user ? '/notifications':'/singIn'}/>
+			</authContext.Provider>
+		</div>
+	);
 }
 
 export default App;
