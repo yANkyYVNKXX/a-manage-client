@@ -1,16 +1,25 @@
-import {authAPI, messagesAPI} from "../../api/api";
+import {messagesAPI} from "../../api/api";
 import styles from './newMailing.module.css'
 import {useContext, useRef, useState} from "react";
-import {authContext} from "../../context/context";
+import {authContext, setHeaderContext} from "../../context/context";
 
 export const NewMailing = () => {
 
-	const {user} = useContext(authContext)
+	
 	const [mailTo, setMailTo] = useState([])
-	const [textareaValue, setTextareaValue] = useState()
+	const [textareaValue, setTextareaValue] = useState('')
 	const [tooltip, setTooltip] = useState(false)
 	const [csvFile, setCsvFile] = useState(false)
+	const [emailsForTooltip, setEmailsForTooltip] = useState(mailTo)
+	const [findWord, setFindWord] = useState('')
+	const [findMode, setFindMode] = useState(false)
+	const [indexTrigger, setIndexTrigger] = useState()
 
+	console.log(findWord)
+	const setHeaderTitle = useContext(setHeaderContext)
+	setHeaderTitle('New mailing')
+
+	const {user} = useContext(authContext)
 	const inputCsv = useRef(null)
 
 	const sendCSV = (file) => {
@@ -22,15 +31,36 @@ export const NewMailing = () => {
 		messagesAPI.sendCSV(formData)
 			.then(res => setMailTo(res.data.mailTo))
 	}
+	
 
 	const handleChangeTextarea = (e) => {
-		if (e.nativeEvent.data === '@') {
-			setTextareaValue(e.target.value)
-			setTooltip(true)
-		} else {
-			setTextareaValue(e.target.value)
+		if (indexTrigger && e.nativeEvent.data === ' '){
+			setIndexTrigger(null)
+			setFindMode(false)
 			setTooltip(false)
 		}
+
+		if (textareaValue.length == indexTrigger+1 && e.nativeEvent.inputType === "deleteContentBackward")
+		{
+			setIndexTrigger(null)
+			setFindMode(false)
+			setTooltip(false)
+		}
+
+		if (e.nativeEvent.data === '@') {
+			if (!indexTrigger){
+				setIndexTrigger(textareaValue.length)
+			}
+			setTooltip(true)
+			setFindMode(true)
+		}
+			
+		if (findMode) {
+				setFindWord(textareaValue.slice(indexTrigger+1, textareaValue.length))
+				setEmailsForTooltip(mailTo.filter(el=>el.email.toLowerCase().search(findWord) !== -1))
+			}
+		
+			setTextareaValue(e.target.value)
 
 	}
 
@@ -50,21 +80,25 @@ export const NewMailing = () => {
 		messagesAPI.uploadDraft(user)
 			.then(res => {
 				setTextareaValue(res.data.textMessage)
-				setMailTo(res.data.mailTo)
-				console.log(inputCsv.current.value = null)
+				if (res.data.mailTo){
+					setMailTo(res.data.mailTo)
+				}
 			})
 
 	}
 
-	const chooseUserFromList = (user) => {
-		setTextareaValue(textareaValue + user)
+	const chooseUserFromList = (email) => {
+		setTextareaValue(textareaValue.slice(0, indexTrigger+1) + email)
 		setTooltip(false)
+		setFindWord('')
+		setFindMode(false)
 	}
 
 	const sendMessage = (e) => {
 		e.preventDefault()
 		messagesAPI.sendMessage({mailTo, textMessage: textareaValue, user})
 	}
+
 	return (
 		<div className={styles.container}>
 			<form className={styles.form}>
@@ -88,13 +122,13 @@ export const NewMailing = () => {
 				</div>
 				<textarea value={textareaValue} onChange={(e) => handleChangeTextarea(e)}/>
 				<div className={styles.emails}>
-				{tooltip && mailTo.map(item => {
+				{tooltip && emailsForTooltip ? emailsForTooltip.map(item => {
 					return (
-						<span  key={item.email} onClick={() => chooseUserFromList(item.name)}>
+						<span  key={item.email} onClick={() => chooseUserFromList(item.email)}>
 							{item.email}
 						</span>
 					)
-				})}
+				}):''}
 				</div>
 				<div className={styles.buttons}>
 					<div className={styles.draft}>

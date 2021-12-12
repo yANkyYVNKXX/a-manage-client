@@ -1,8 +1,7 @@
 import {SingUp} from "../components/SingUp";
 import {SingIn} from "../components/SingIn";
 import {NewMailing} from "../components/NewMessage";
-import {Notifications} from "../components/Notifications";
-import {Dashboards} from "../components/Dashboards";
+import {MailingLists} from "../components/MailingLists";
 
 export const Public = [
 		{
@@ -23,13 +22,8 @@ export const Public = [
 			exact: true,
 		},
 		{
-			path:'/notifications',
-			component: Notifications,
-			exact: true,
-		},
-		{
-			path:'/dashboards',
-			component: Dashboards,
+			path:'/mailingLists',
+			component: MailingLists,
 			exact: true,
 		},
 	]

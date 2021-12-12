@@ -1,11 +1,12 @@
 import styles from './privateRoutes.module.css'
-import {Route, Switch, useHistory, useLocation, useParams} from "react-router-dom";
+import {Route, Switch} from "react-router-dom";
 import {Private} from "../../routes/routes";
 import {Sidebar} from "../Sidebar";
+import { useState } from 'react/cjs/react.development';
+import { setHeaderContext } from '../../context/context';
 
 export const PrivateRoutes = () =>{
-	const location = useLocation();
-	const headerTitle = location.pathname.slice(1,location.pathname.length).toUpperCase()
+	const [headerTitle, setHeaderTitle] = useState()
 
 	return (
 		<div className={styles.container}>
@@ -18,6 +19,7 @@ export const PrivateRoutes = () =>{
 				<div>
 				</div>
 			</header>
+			<setHeaderContext.Provider value={setHeaderTitle}>
 			<Switch>
 			{
 				Private.map((item) => {
@@ -30,6 +32,7 @@ export const PrivateRoutes = () =>{
 				})
 			}
 			</Switch>
+			</setHeaderContext.Provider>
 			</div>
 		</div>
 	)}

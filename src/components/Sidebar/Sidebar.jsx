@@ -21,8 +21,8 @@ export const Sidebar = () =>{
 				<span>manage</span>
 			</div>
 			<div className={styles.menu}>
-				<NavLink to='/notifications'>Notifications</NavLink>
-				<NavLink to='/dashboards'>Dashboards</NavLink>
+				<NavLink to='/newMailing'>New mailing</NavLink>
+				<NavLink to='/mailingLists'>Mailing lists</NavLink>
 			</div>
 			</div>
 			<div className={styles.logout}>

@@ -21,7 +21,7 @@ function App() {
 		<div className={styles.container}>
 			<authContext.Provider value={{user, setUser}}>
 				{user ? <PrivateRoutes/> : <PublicRoutes/>}
-				<Redirect to={user ? '/notifications':'/singIn'}/>
+				<Redirect to={user ? '/newMailing':'/singIn'}/>
 			</authContext.Provider>
 		</div>
 	);
